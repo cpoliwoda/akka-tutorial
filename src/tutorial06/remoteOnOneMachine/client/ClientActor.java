@@ -5,6 +5,7 @@
 package tutorial06.remoteOnOneMachine.client;
 
 import akka.actor.UntypedActor;
+import java.util.concurrent.TimeUnit;
 import tutorial06.remoteOnOneMachine.Messages;
 
 /**
@@ -38,6 +39,9 @@ public class ClientActor extends UntypedActor {
             System.out.println("  C3>> original send from " + getSender()
                     + ",\n with message: " + msg.getMessage()
                     + ",\n with actor: " + msg.getActor());
+            
+            //make a break before respond on message
+            TimeUnit.MILLISECONDS.sleep(500);// 0.5 seconds
 
             if (msg.getActor() == null) {
                 System.err.println("  C4>> actor is NULL in Messages.Info");
