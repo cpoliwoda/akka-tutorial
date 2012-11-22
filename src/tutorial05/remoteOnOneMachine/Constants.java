@@ -17,6 +17,7 @@ public class Constants {
     public static int serverPort = 2552;
     public static String serverSystemName = "serverSystem";
     //client
+    public static String clientIP = "127.0.0.1";
     public static int clientPort = 2553;
     public static String clientSystemName = "clientSystem";
 }

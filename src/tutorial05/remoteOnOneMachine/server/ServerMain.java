@@ -9,6 +9,9 @@ import akka.actor.ActorSystem;
 import akka.actor.Props;
 import com.typesafe.config.Config;
 import com.typesafe.config.ConfigFactory;
+import java.util.concurrent.TimeUnit;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import tutorial05.remoteOnOneMachine.ConfigFiles;
 import tutorial05.remoteOnOneMachine.Constants;
 
@@ -32,8 +35,45 @@ public class ServerMain {
         //create an actor system with user choosen system name and configuration
         ActorSystem system = ActorSystem.create(Constants.serverSystemName, config);
         
-        //create new actors
+        //create local in this system a new actor
         ActorRef serverActor = system.actorOf(new Props(ServerActor.class), "serverActor");
+        
+        //look remote for an actor
+        //REMOTE
+        ////Path need to be of the folling structure:
+        //               akka://<actorsystemname>@<hostname>:<port>/<actor path>
+        //Notice:
+        //<actor path> consists of "user/" + actorName
+        String pathToRemoteClientActor = "akka://" + Constants.clientSystemName
+                + "@" + Constants.clientIP + ":" + Constants.clientPort
+                + "/user/clientActor";
+
+        //Notice the difference:
+        //actorFOR() here and actorOF() that was used before
+        //see docu: http://doc.akka.io/docs/akka/2.0.3/general/addressing.html#actorof-vs-actorfor
+        //
+        //actorOf: only ever creates a new actor, and it creates it as a direct 
+        //         child of the context on which this method is invoked 
+        //         (which may be any actor or actor system).
+        //actorFor: only ever looks up an existing actor, i.e. does not create one.
+
+        ActorRef remoteClientActor = system.actorFor(pathToRemoteClientActor);
+        
+        System.out.println("Server system is running ...");
+        
+        //waiting for second/remote system to be startet by user
+        for (int i = 0; i < 10; i++) {
+            System.out.println("Waited "+i+" seconds.");
+            try {
+                TimeUnit.SECONDS.sleep( 1 );
+            } catch (InterruptedException ex) {
+                Logger.getLogger(ServerMain.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
+
+        //send the remote actor a message
+        System.out.println("sending message to an actor in an other actor system ...");
+        remoteClientActor.tell("remote msg from ServerMain");
      
     }
     

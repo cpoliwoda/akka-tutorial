@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package tutorial05.remoteOnOneMachine.server;
+package tutorial05.remoteOnOneMachine.client;
 
 import akka.actor.UntypedActor;
 import tutorial05.remoteOnOneMachine.Messages;
@@ -12,7 +12,7 @@ import tutorial05.remoteOnOneMachine.Messages;
  * 
  * @author Christian Poliwoda <christian.poliwoda@gcsc.uni-frankfurt.de>
  */
-public class ServerActor extends UntypedActor {
+public class ClientActor extends UntypedActor {
 
     @Override
     public void onReceive(Object o) throws Exception {
