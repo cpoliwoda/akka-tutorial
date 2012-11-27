@@ -21,12 +21,9 @@ public class HelloActor extends UntypedActor {
         if (o instanceof String) {
             String msg = (String) o;
             System.out.println("  String >> " + msg);
-            getSender().tell(msg, getSelf());
-
-        } else if (o instanceof Result) {
-            Result msg = (Result) o;
-            System.out.println("  Result >> " + msg);
-            getSender().tell(msg, getSelf());
+            
+            //response on a message by doubling the message
+            getSender().tell("\n"+msg +"\n"+ msg, getSelf());
 
         } else {
             System.out.println("  unhandled Message:\n" + o);

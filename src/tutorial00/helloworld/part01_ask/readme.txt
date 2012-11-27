@@ -1,20 +1,23 @@
 In this package (tutorial00.helloworld.part01_ask) is an example of:
 
+## Notice
+Using Patterns.ask() will send a message to the receiving Actor as with tell(), 
+and the receiving actor must reply with ***getSender().tell(reply)*** in order to 
+complete the returned Future with a value.
+
 ## Learning
-- starting an ("akka") actor system with a system name
-- creating actors
-- asking actors for a (string) message
-- pipe the responds to a third actor
-- and shuting down the system
+- starting an actor system with a system name
+- creating an actor with name
+- asking the actor
+- waiting for a response / answer of the actor
+- printing the response
 
 
 ## Output:
 You should see something similiar like these:
 
 > HelloActor.Actor[akka://AskSystem/user/actorA] got mail from Actor[akka://AskSystem/temp/$a]:
-> HelloActor.Actor[akka://AskSystem/user/actorB] got mail from Actor[akka://AskSystem/temp/$b]:
->   Result >> x = 0 , s = zero
 >   String >> request
-> HelloActor.Actor[akka://AskSystem/user/actorC] got mail from Actor[akka://AskSystem/deadLetters]:
->   unhandled Message:
-> Failure(java.lang.ClassCastException: tutorial00.helloworld.part02_ask.Result cannot be cast to java.lang.String)
+> Response is instanceof String : 
+> request
+> request

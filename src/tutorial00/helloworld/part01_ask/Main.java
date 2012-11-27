@@ -7,8 +7,9 @@ package tutorial00.helloworld.part01_ask;
 import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
 import akka.actor.Props;
-import static akka.pattern.Patterns.ask;
-import static akka.pattern.Patterns.pipe;
+import akka.dispatch.Await;
+import akka.pattern.Patterns;
+import akka.pattern.Patterns;
 import akka.dispatch.Future;
 import akka.dispatch.Futures;
 import akka.dispatch.Mapper;
@@ -17,6 +18,9 @@ import akka.util.Timeout;
 import java.util.concurrent.TimeUnit;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.jar.Manifest;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /** 
  * BASED ON CODE FROM: http://doc.akka.io/docs/akka/2.0.3/java/untyped-actors.html
@@ -43,37 +47,54 @@ public class Main {
         //create an actor system with Name
         ActorSystem system = ActorSystem.create("AskSystem");
 
-        //create new actors
-        ActorRef actorA = system.actorOf(new Props(HelloActor.class), "actorA");
-        ActorRef actorB = system.actorOf(new Props(HelloActor.class), "actorB");
-        ActorRef actorC = system.actorOf(new Props(HelloActor.class), "actorC");
+        //create an actor with user choosen name
+        ActorRef actor = system.actorOf(new Props(HelloActor.class), "actorA");
 
-        //ask the actors for a message/result
+        //
+        //ask the actor for a message/result
+        //
+        
+        Duration duration = Duration.create(5, TimeUnit.SECONDS);
+        final Timeout timeout = new Timeout(duration);
 
-        final Timeout t = new Timeout(Duration.create(5, TimeUnit.SECONDS));
+        // this is one way to "ask" an actor
+        Future<Object> future = Patterns.ask(actor, "request", timeout);
 
-        final ArrayList<Future<Object>> futures = new ArrayList<Future<Object>>();
-        futures.add(ask(actorA, new Result(0, "zero"), 1000)); // using 1000ms timeout
-        futures.add(ask(actorB, "request", t)); // using timeout from above
+        Object result = null;
 
-        final Future<Iterable<Object>> aggregate = Futures.sequence(futures, system.dispatcher());
+        try {
+            // store the result of the "ask"
+            result = Await.result(future, duration);
 
-        final Future<Result> transformed = aggregate.map(new Mapper<Iterable<Object>, Result>() {
-            @Override
-            public Result apply(Iterable<Object> coll) {
-                final Iterator<Object> it = coll.iterator();
+        } catch (Exception ex) {
+            Logger.getLogger(Main.class.getName()).log(Level.SEVERE, null, ex);
+        }
 
-                final String s = (String) it.next();
-                final int x = (Integer) it.next();
+        // use the result
+        if (result instanceof String) {
 
-                return new Result(x, s);
-            }
-        });
+            System.out.println("Response is instanceof String : " + ((String) result));
 
-        pipe(transformed).to(actorC);
-
+        } else {
+            System.out.println("Response is of unknown Class !!!\n" + result);
+        }
 
         //shutdown the actor system
         system.shutdown();
     }
 }
+/* http://alvinalexander.com/scala/scala-akka-actors-ask-examples-future-await-timeout-result
+ 
+  // (1) this is one way to "ask" another actor
+  implicit val timeout = Timeout(5 seconds)
+  val future = myActor ? AskNameMessage
+  val result = Await.result(future, timeout.duration).asInstanceOf[String]
+  println(result)
+
+  // (2) this is a slightly different way to ask another actor
+  val future2: Future[String] = ask(myActor, AskNameMessage).mapTo[String]
+  val result2 = Await.result(future2, 1 second)
+  println(result2)
+ 
+ 
+ */
