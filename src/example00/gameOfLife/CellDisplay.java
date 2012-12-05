@@ -4,102 +4,54 @@
  */
 package example00.gameOfLife;
 
-import akka.actor.ActorRef;
 import akka.actor.UntypedActor;
-import akka.dispatch.Await;
-import akka.dispatch.Future;
-import akka.pattern.Patterns;
-import akka.util.Duration;
-import akka.util.Timeout;
-import example00.gameOfLife.Events.*;
+import example00.gameOfLife.Events.Alive;
+import example00.gameOfLife.Events.Dead;
+import example00.gameOfLife.Events.GetPanel;
 import java.awt.Color;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.swing.border.Border;
-import javax.swing.border.LineBorder;
 
 /**
  *
  * @author Christian Poliwoda <christian.poliwoda@gcsc.uni-frankfurt.de>
  */
-public class CellDisplay extends UntypedActor implements MouseListener {
+public class CellDisplay extends UntypedActor {
 
-    ActorRef cell;
-    Border border = LineBorder.createBlackLineBorder();
-    Color background = Color.WHITE;
-//            Label contents = new Label("");
+    private Cell cell = null;
+    private FlowPanel panel = null;
 
-    public CellDisplay(ActorRef cell) {
+    public CellDisplay(Cell cell) {
         this.cell = cell;
+        panel = new FlowPanel(cell);
     }
+    
+    
 
     @Override
     public void onReceive(Object o) throws Exception {
 
         if (o instanceof Dead) {
-            background = Color.WHITE;
+            panel.setBackground( Color.WHITE);
         } else if (o instanceof Alive) {
-            background = Color.BLUE;
+             panel.setBackground ( Color.BLUE);
         } else if (o instanceof GetPanel) {
-            getSender().tell(this);
+            getSender().tell(getPanel());
         }
     }
 
-    @Override
-    public void mouseClicked(MouseEvent e) {
-
-        //java
-        Duration duration = Duration.create(1, TimeUnit.SECONDS);
-        Timeout timeout = new Timeout(duration);
-        Future<Object> future = Patterns.ask(cell, new GetState(), timeout);
-
-        Object response = null;
-
-            try {
-                response = Await.result(future, duration);
-
-            } catch (Exception ex) {
-                Logger.getLogger(Cell.class.getName()).log(Level.SEVERE, null, ex);
-            }
-
-        CellState oldState = null;
-
-        if (response instanceof CellState) {
-            oldState = (CellState) response;
-
-            cell.tell(oldState.isAlive() ? new ResetDead() : new ResetAlive());
-            background = oldState.isAlive() ? Color.WHITE : Color.BLUE;
-        }
-
-
-//            //scala
-//                val oldState :CellState = ( ( cell !! GetState ).get ).asInstanceOf[CellState]
-//                cell ! ( if( oldState.isAlive ) ResetDead else ResetAlive )
-//                background = if( oldState.isAlive ) Color.WHITE else Color.BLUE
+    /**
+     * @return the cell
+     */
+    public Cell getCell() {
+        return cell;
     }
 
-    @Override
-    public void mousePressed(MouseEvent e) {
-//            throw new UnsupportedOperationException("Not supported yet.");
+    /**
+     * @return the panel
+     */
+    public FlowPanel getPanel() {
+        return panel;
     }
 
-    @Override
-    public void mouseReleased(MouseEvent e) {
-//            throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public void mouseEntered(MouseEvent e) {
-//            throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
-    public void mouseExited(MouseEvent e) {
-//            throw new UnsupportedOperationException("Not supported yet.");
-    }
 }
 
 /* 

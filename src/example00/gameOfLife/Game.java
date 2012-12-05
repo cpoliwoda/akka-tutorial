@@ -1,16 +1,80 @@
 package example00.gameOfLife;
 
+import akka.kernel.Bootable;
+import com.sun.java.swing.plaf.gtk.GTKConstants;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import javax.swing.BoxLayout;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+
 /*
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-
 /**
  *
  * @author Christian Poliwoda <christian.poliwoda@gcsc.uni-frankfurt.de>
  */
-public class Game {
+public class Game implements Bootable{
     
+        static int ROWS = 40;
+        static int COLUMNS = 40;
+        static int[] dimensions = {ROWS, COLUMNS};
+    
+    final static CellMatrix cellMatrix = new CellMatrix(ROWS, COLUMNS);
+
+    static MatrixDisplay matrixDisplay = new MatrixDisplay(cellMatrix, dimensions);
+
+    public static void main(String[] args) {
+
+//        int ROWS = 40;
+//        int COLUMNS = 40;
+//        int[] dimensions = {ROWS, COLUMNS};
+//
+//        final CellMatrix cellMatrix = new CellMatrix(ROWS, COLUMNS);
+//
+//        MatrixDisplay matrixDisplay = new MatrixDisplay(cellMatrix, dimensions);
+
+        JFrame frame = new JFrame("Game of Life");
+        frame.setResizable(true);
+
+        frame.add(matrixDisplay.gridPanel);
+
+        JButton run = new JButton();
+        run.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                cellMatrix.run();
+            }
+        });
+
+        JButton pause = new JButton();
+        pause.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                cellMatrix.pause();
+            }
+        });
+
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+// override def shutdown() {	
+//cellMatrix.shutdown
+//matrixDisplay.shutdown
+//    }
+
+    }//main
+
+    @Override
+    public void startup() {
+    }
+
+    @Override
+    public void shutdown() {
+    cellMatrix.shutdown();
+//    matrixDisplay.shutdown();
+    }
 }
 
 /* 

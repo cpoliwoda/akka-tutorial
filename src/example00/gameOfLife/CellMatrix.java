@@ -34,28 +34,48 @@ public class CellMatrix implements Iterable<CellRow> {
         dimension[1] = cellRows.get(0).size();
 
     }//CellMatrix(ArrayList<CellRow>)
-    
-    public CellRow getRow(int i) { return cellRows.get(i);}
-    public CellRow apply(int i) { return cellRows.get(i);}
-    
-    public Cell getCell(int row, int column){
-        return getRow(row).getCell(column);
-    }
 
-    public CellMatrix apply(int rows, int columns) {
+    public CellMatrix(int rows, int columns) {
 
-        CellMatrix cells = new CellMatrix(makeCellRows(rows, columns));
-
-        for (CellRow cellRow : cells.cellRows) {
+        cellRows = makeCellRows(rows, columns); 
+        
+        dimension[0] = cellRows.size();
+        dimension[1] = cellRows.get(0).size();
+        
+        for (CellRow cellRow : cellRows) {
             for (Cell cell : cellRow.getCells()) {
                 cell.getSelf().tell(new Events.Start());
             }
         }
 
-        interconnect(cells);
+        interconnect(cellRows);
+    }
+    
+    
+    
+    public CellRow getRow(int i) { return cellRows.get(i);}
+    
+//    public CellRow apply(int i) { return cellRows.get(i);}
 
-        return cells;
-    }//CellMatrix apply(int rows, int columns)
+//    public CellMatrix apply(int rows, int columns) {
+//
+//        CellMatrix cells = new CellMatrix(makeCellRows(rows, columns));
+//
+//        for (CellRow cellRow : cells.cellRows) {
+//            for (Cell cell : cellRow.getCells()) {
+//                cell.getSelf().tell(new Events.Start());
+//            }
+//        }
+//
+//        interconnect(cells);
+//
+//        return cells;
+//    }//CellMatrix apply(int rows, int columns)
+    
+    
+    public Cell getCell(int row, int column){
+        return getRow(row).getCell(column);
+    }
 
     @Override
     public Iterator<CellRow> iterator() {
@@ -142,18 +162,17 @@ public class CellMatrix implements Iterable<CellRow> {
         return result;
     }//makeCellRows
 
-    private void interconnect(CellMatrix cellMatrix) {
-        for (CellRow cellRow : cellMatrix.cellRows) {
+    private void interconnect(ArrayList<CellRow> cellRows) {
+        for (CellRow cellRow : cellRows) {
             for (Cell cell : cellRow.getCells()) {
-                connect(cell, cellMatrix);
+                connect(cell, cellRows);
             }
         }
     }//interconnect
 
-    private void connect(Cell cell, CellMatrix cellMatrix) {
-
-        int rowDimension = cellMatrix.dimension[0];
-        int columnDimension = cellMatrix.dimension[1];
+    private void connect(Cell cell, ArrayList<CellRow> cellRows) {
+        int rowDimension = dimension[0];
+        int columnDimension = dimension[1];
 
         Duration duration = Duration.create(5, TimeUnit.SECONDS);
         final Timeout timeout = new Timeout(duration);
