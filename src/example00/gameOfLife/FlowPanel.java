@@ -4,6 +4,7 @@
  */
 package example00.gameOfLife;
 
+import akka.actor.ActorRef;
 import akka.dispatch.Await;
 import akka.dispatch.Future;
 import akka.pattern.Patterns;
@@ -26,12 +27,12 @@ import javax.swing.border.LineBorder;
  */
 public class FlowPanel extends JPanel implements MouseListener {
 
-    Cell cell = null;
+    ActorRef cell = null;
 //    Border border = null;
 //    Color background = null;
 //            Label contents = null;
 
-    public FlowPanel(Cell cell) {
+    public FlowPanel(ActorRef cell) {
         super(new FlowLayout());
 
         this.cell = cell;
@@ -46,7 +47,7 @@ public class FlowPanel extends JPanel implements MouseListener {
         //java
         Duration duration = Duration.create(1, TimeUnit.SECONDS);
         Timeout timeout = new Timeout(duration);
-        Future<Object> future = Patterns.ask(cell.getSelf(), new Events.GetState(), timeout);
+        Future<Object> future = Patterns.ask(cell, new Events.GetState(), timeout);
 
         Object response = null;
 
@@ -62,7 +63,7 @@ public class FlowPanel extends JPanel implements MouseListener {
         if (response instanceof Events.CellState) {
             oldState = (Events.CellState) response;
 
-            cell.getSelf().tell(oldState.isAlive() ? new Events.ResetDead() : new Events.ResetAlive());
+            cell.tell(oldState.isAlive() ? new Events.ResetDead() : new Events.ResetAlive());
             setBackground(oldState.isAlive() ? Color.WHITE : Color.BLUE);
         }
 

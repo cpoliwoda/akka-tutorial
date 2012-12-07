@@ -38,21 +38,21 @@ public class MatrixDisplay {
     void displaysFor(CellMatrix cellMatrix) {
         Cell display = null;
         for (CellRow cellRow : cellMatrix) {
-            for (Cell cell : cellRow) {
+            for (ActorRef cell : cellRow) {
 
                 System.out.println(cell);
 
-                cell.getSelf().tell(new Events.Start());
+                cell.tell(new Events.Start());
                 displayFor(cell);
             }
         }
     }//displaysFor
 
-    CellDisplay displayFor(Cell cell) {
+    CellDisplay displayFor(ActorRef cell) {
 
         CellDisplay display = new CellDisplay(cell);
         ActorRef actor = display.getSelf();
-        cell.getSelf().tell(new Events.AddListener(actor));
+        cell.tell(new Events.AddListener(actor));
         
         return display;
     }

@@ -4,6 +4,7 @@
  */
 package example00.gameOfLife;
 
+import akka.actor.ActorRef;
 import akka.dispatch.Await;
 import akka.dispatch.Future;
 import akka.pattern.Patterns;
@@ -28,9 +29,9 @@ public class GridPanel extends JPanel{
         Timeout timeout = new Timeout(duration);
         
         for ( CellRow cellRow : cellMatrix) {
-            for (Cell cell : cellRow) {
+            for (ActorRef cell : cellRow) {
                 
-                Future future = Patterns.ask(cell.getSelf(), new Events.GetPanel(), timeout);
+                Future future = Patterns.ask(cell, new Events.GetPanel(), timeout);
 
             Object response = null;
 

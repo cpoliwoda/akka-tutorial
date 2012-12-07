@@ -1,5 +1,6 @@
 package example00.gameOfLife;
 
+import akka.actor.ActorSystem;
 import akka.kernel.Bootable;
 import com.sun.java.swing.plaf.gtk.GTKConstants;
 import java.awt.event.ActionEvent;
@@ -17,25 +18,22 @@ import javax.swing.JPanel;
  *
  * @author Christian Poliwoda <christian.poliwoda@gcsc.uni-frankfurt.de>
  */
-public class Game implements Bootable{
-    
-        static int ROWS = 40;
-        static int COLUMNS = 40;
-        static int[] dimensions = {ROWS, COLUMNS};
-    
-    final static CellMatrix cellMatrix = new CellMatrix(ROWS, COLUMNS);
+public class Game implements Bootable {
 
-    static MatrixDisplay matrixDisplay = new MatrixDisplay(cellMatrix, dimensions);
+    static int ROWS = 40;
+    static int COLUMNS = 40;
+    static int[] dimensions = {ROWS, COLUMNS};
+    static CellMatrix cellMatrix; // = new CellMatrix(ROWS, COLUMNS);
+    static MatrixDisplay matrixDisplay;// = new MatrixDisplay(cellMatrix, dimensions);
+    static ActorSystem system;
 
     public static void main(String[] args) {
 
-//        int ROWS = 40;
-//        int COLUMNS = 40;
-//        int[] dimensions = {ROWS, COLUMNS};
-//
-//        final CellMatrix cellMatrix = new CellMatrix(ROWS, COLUMNS);
-//
-//        MatrixDisplay matrixDisplay = new MatrixDisplay(cellMatrix, dimensions);
+        system = ActorSystem.create();
+
+        cellMatrix = new CellMatrix(ROWS, COLUMNS);
+
+        matrixDisplay = new MatrixDisplay(cellMatrix, dimensions);
 
         JFrame frame = new JFrame("Game of Life");
         frame.setResizable(true);
@@ -59,10 +57,6 @@ public class Game implements Bootable{
         });
 
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-// override def shutdown() {	
-//cellMatrix.shutdown
-//matrixDisplay.shutdown
-//    }
 
     }//main
 
@@ -72,7 +66,7 @@ public class Game implements Bootable{
 
     @Override
     public void shutdown() {
-    cellMatrix.shutdown();
+        cellMatrix.shutdown();
 //    matrixDisplay.shutdown();
     }
 }

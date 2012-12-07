@@ -43,8 +43,8 @@ public class CellMatrix implements Iterable<CellRow> {
         dimension[1] = cellRows.get(0).size();
         
         for (CellRow cellRow : cellRows) {
-            for (Cell cell : cellRow.getCells()) {
-                cell.getSelf().tell(new Events.Start());
+            for (ActorRef cell : cellRow.getCells()) {
+                cell.tell(new Events.Start());
             }
         }
 
@@ -73,7 +73,7 @@ public class CellMatrix implements Iterable<CellRow> {
 //    }//CellMatrix apply(int rows, int columns)
     
     
-    public Cell getCell(int row, int column){
+    public ActorRef getCell(int row, int column){
         return getRow(row).getCell(column);
     }
 
@@ -104,7 +104,7 @@ public class CellMatrix implements Iterable<CellRow> {
 //foreach( cell => cell !! Init )  // TELL or ASK ???
 //foreach( cell => cell ! Run )   }
         for (CellRow cellRow : cellRows) {
-            for (Cell cell : cellRow) {
+            for (ActorRef cell : cellRow) {
 //                cell.tell(new Events.Init()); // TELL?? 
                 
                 //ASK =>
@@ -112,7 +112,7 @@ public class CellMatrix implements Iterable<CellRow> {
                 final Timeout timeout = new Timeout(duration);
 
                 // this is one way to "ask" an actor
-                Future<Object> future = Patterns.ask(cell.getSelf(), new Events.Init(), timeout);
+                Future<Object> future = Patterns.ask(cell, new Events.Init(), timeout);
 
                 Object result = null;
 
@@ -127,8 +127,8 @@ public class CellMatrix implements Iterable<CellRow> {
             }
         }
         for (CellRow cellRow : cellRows) {
-            for (Cell cell : cellRow) {
-                cell.getSelf().tell(new Events.Run());
+            for (ActorRef cell : cellRow) {
+                cell.tell(new Events.Run());
             }
         }
     }//run()
@@ -136,8 +136,8 @@ public class CellMatrix implements Iterable<CellRow> {
     public void pause() {//def pause = foreach( cell => cell ! Pause )
 
         for (CellRow cellRow : cellRows) {
-            for (Cell cell : cellRow) {
-                cell.getSelf().tell(new Events.Pause());
+            for (ActorRef cell : cellRow) {
+                cell.tell(new Events.Pause());
             }
         }
     }//pause
@@ -145,8 +145,8 @@ public class CellMatrix implements Iterable<CellRow> {
     public void shutdown() {//def shutdown = foreach( cell => cell.stop )
 
         for (CellRow cellRow : cellRows) {
-            for (Cell cell : cellRow) {
-                cell.getSelf().tell(new Events.Stop());
+            for (ActorRef cell : cellRow) {
+                cell.tell(new Events.Stop());
             }
         }
     }//shutdown
@@ -164,13 +164,13 @@ public class CellMatrix implements Iterable<CellRow> {
 
     private void interconnect(ArrayList<CellRow> cellRows) {
         for (CellRow cellRow : cellRows) {
-            for (Cell cell : cellRow.getCells()) {
+            for (ActorRef cell : cellRow.getCells()) {
                 connect(cell, cellRows);
             }
         }
     }//interconnect
 
-    private void connect(Cell cell, ArrayList<CellRow> cellRows) {
+    private void connect(ActorRef cell, ArrayList<CellRow> cellRows) {
         int rowDimension = dimension[0];
         int columnDimension = dimension[1];
 
@@ -178,7 +178,7 @@ public class CellMatrix implements Iterable<CellRow> {
         final Timeout timeout = new Timeout(duration);
 
         // this is one way to "ask" an actor
-        Future<Object> future = Patterns.ask(cell.getSelf(), new Events.GetPosition(), timeout);
+        Future<Object> future = Patterns.ask(cell, new Events.GetPosition(), timeout);
 
         Object result = null;
 
@@ -198,7 +198,7 @@ public class CellMatrix implements Iterable<CellRow> {
             int row = position.getX();
             int column = position.getY();
 
-        ArrayList<Cell> neighbours = new ArrayList<>();
+        ArrayList<ActorRef> neighbours = new ArrayList<>();
 
         neighbours.add(getCell(row, (column + columnDimension - 1) % columnDimension));// left neighbour
         neighbours.add(getCell(row, (column + 1) % columnDimension));// right neighbour
@@ -211,7 +211,7 @@ public class CellMatrix implements Iterable<CellRow> {
         neighbours.add(getCell((row + 1) % rowDimension, column));// below neighbour
         neighbours.add(getCell((row + 1) % rowDimension, (column + 1) % columnDimension));// below right neighbour
 
-        cell.getSelf().tell(new Events.ResetNeighbors(neighbours));
+        cell.tell(new Events.ResetNeighbors(neighbours));
         }
     }//connect
 }

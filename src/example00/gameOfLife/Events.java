@@ -45,16 +45,16 @@ public class Events {
     // initializes / resets a cell with its neighbor cells (the cell depends on)
     public static class ResetNeighbors extends Event {
 
-        private ArrayList<Cell> neighborCells;
+        private ArrayList<ActorRef> neighborCells;
 
-        public ResetNeighbors(ArrayList<Cell> neighborCells) {
+        public ResetNeighbors(ArrayList<ActorRef> neighborCells) {
             this.neighborCells = neighborCells;
         }
 
         /**
          * @return the neighborCells
          */
-        public ArrayList<Cell> getNeighborCells() {
+        public ArrayList<ActorRef> getNeighborCells() {
             return neighborCells;
         }
     }

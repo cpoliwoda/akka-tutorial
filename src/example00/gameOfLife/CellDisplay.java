@@ -4,6 +4,7 @@
  */
 package example00.gameOfLife;
 
+import akka.actor.ActorRef;
 import akka.actor.UntypedActor;
 import example00.gameOfLife.Events.Alive;
 import example00.gameOfLife.Events.Dead;
@@ -16,10 +17,10 @@ import java.awt.Color;
  */
 public class CellDisplay extends UntypedActor {
 
-    private Cell cell = null;
+    private ActorRef cell = null;
     private FlowPanel panel = null;
 
-    public CellDisplay(Cell cell) {
+    public CellDisplay(ActorRef cell) {
         this.cell = cell;
         panel = new FlowPanel(cell);
     }
@@ -41,7 +42,7 @@ public class CellDisplay extends UntypedActor {
     /**
      * @return the cell
      */
-    public Cell getCell() {
+    public ActorRef getCell() {
         return cell;
     }
 

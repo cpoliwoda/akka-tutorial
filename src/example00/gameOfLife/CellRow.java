@@ -4,7 +4,10 @@
  */
 package example00.gameOfLife;
 
+import akka.actor.Actor;
 import akka.actor.ActorRef;
+import akka.actor.Props;
+import akka.actor.UntypedActorFactory;
 import java.util.ArrayList;
 import java.util.Iterator;
 
@@ -12,28 +15,40 @@ import java.util.Iterator;
  *
  * @author Christian Poliwoda <christian.poliwoda@gcsc.uni-frankfurt.de>
  */
-public class CellRow implements Iterable<Cell> {
+public class CellRow implements Iterable<ActorRef> {
 
-    private ArrayList<Cell> cells = null;
+    private ArrayList<ActorRef> cells = null;
 
-    public CellRow(int row , int columns ) {
-        cells = new ArrayList<Cell>();
+    public CellRow(final int row , int columns ) {
+        cells = new ArrayList<ActorRef>();
         
         for (int col = 0; col < columns; col++) {
-            cells.add(new Cell(row , col));
+//            //TRY01
+//            cells.add(new Cell(row , col));
+//            //TRY02
+//            cells.add(Game.system.actorOf(new Props(new UntypedActorFactory() {
+//
+//                @Override
+//                public Actor create() throws Exception {
+//                    return new Cell(row , col);
+//                }
+//            }),"cell "+row+","+col));
+            //TRY03
+            cells.add(Game.system.actorOf(new Props(new CellFactory(row, col)),"C:"+row+","+col));
+            
         }
     }
     
     @Override
-    public Iterator<Cell> iterator() {
-        Iterator<Cell> it = new Iterator<Cell>() {
+    public Iterator<ActorRef> iterator() {
+        Iterator<ActorRef> it = new Iterator<ActorRef>() {
             @Override
             public boolean hasNext() {
                 return getCells().iterator().hasNext();
             }
 
             @Override
-            public Cell next() {
+            public ActorRef next() {
                 return getCells().iterator().next();
             }
 
@@ -46,7 +61,7 @@ public class CellRow implements Iterable<Cell> {
         return it;
     }
 
-    public Cell getCell(int i) {
+    public ActorRef getCell(int i) {
         return getCells().get(i);
     }
     
@@ -57,7 +72,7 @@ public class CellRow implements Iterable<Cell> {
     /**
      * @return the cells
      */
-    public ArrayList<Cell> getCells() {
+    public ArrayList<ActorRef> getCells() {
         return cells;
     }
 }

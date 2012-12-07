@@ -38,7 +38,7 @@ public class Cell extends UntypedActor {
 
     Position position;
     CellState state = new Dead(this);
-    ArrayList<Cell> neighborCells = null;
+    ArrayList<ActorRef> neighborCells = null;
     int neighborCellsAlive = 0;
     ArrayList<ActorRef> listeners = null;
     boolean initializing = true;
@@ -133,9 +133,9 @@ public class Cell extends UntypedActor {
         Duration duration = Duration.create(1, TimeUnit.SECONDS);
         Timeout timeout = new Timeout(duration);
 
-        for (Cell cell : neighborCells) {
+        for (ActorRef cell : neighborCells) {
 
-            Future future = Patterns.ask(cell.getSelf(), new GetState(), timeout);
+            Future future = Patterns.ask(cell, new GetState(), timeout);
 
             Object response = null;
 
@@ -182,8 +182,8 @@ public class Cell extends UntypedActor {
             cell.tell(state);
         }
 
-        for (Cell cell : neighborCells) {
-            cell.getSelf().tell(state);
+        for (ActorRef cell : neighborCells) {
+            cell.tell(state);
         }
     }//fireNewState
 
