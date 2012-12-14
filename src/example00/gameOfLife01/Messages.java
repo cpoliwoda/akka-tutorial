@@ -16,6 +16,9 @@ public class Messages {
     public interface Message{
     }
     
+    public static class Update implements Message{
+    }
+    
     protected static class Neighbors implements Message{
         private ArrayList<Cell> neighbors;
 

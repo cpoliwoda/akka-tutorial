@@ -15,16 +15,16 @@ import javax.swing.JFrame;
  *
  * @author Christian Poliwoda <christian.poliwoda@gcsc.uni-frankfurt.de>
  */
-public class Main {//extends JFrame {
+public class Main {
 
     private static JFrame frame;
     
-    private static int row =3;
-    private static int column =3;
+    private static int row =9;
+    private static int column =9;
 
     public static void main(String[] args) {
 
-        Game app = new Game(row,column);// create (row * column) cells
+        Game app = new Game(row,column);
         System.out.println("Game created.");
 
         generateGUI(app);
@@ -49,8 +49,11 @@ public class Main {//extends JFrame {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-//                app.getCell().getActor().tell(new Messages.Start());
-                System.out.println("START-BUTTON");
+//                System.out.println("START-BUTTON");
+                for (Cell cell : app.getCells()) {
+                    cell.getActor().tell(new Messages.Update());
+                }
+                
             }
         });
         
@@ -58,7 +61,6 @@ public class Main {//extends JFrame {
 
             @Override
             public void actionPerformed(ActionEvent e) {
-//                app.getCell().getActor().tell(new Messages.Stop());
                 System.out.println("STOP-BUTTON");
             }
         });
@@ -66,8 +68,6 @@ public class Main {//extends JFrame {
         innerMenu.add(start);
         innerMenu.add(stop);
 
-//        innerCells.add(new JCheckBox());
-//        innerCells.add(app.getCell().getCheckBox());
         addCellsToBox(innerCells, app.getCells());
         
         outter.add(innerMenu);
@@ -75,18 +75,12 @@ public class Main {//extends JFrame {
 
         frame.add(outter);
 
-
-//        frame.setSize(200, 100);
         frame.pack();
         frame.setVisible(true);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
     
     private static void addCellsToBox(Box box, ArrayList<Cell> cells){
-        
-//        for (Cell cell : cells) {
-//            box.add(cell.getCheckBox());
-//        }
         
         for (int i = 0; i < row; i++) {
             Box rowBox =  Box.createHorizontalBox();

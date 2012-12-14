@@ -9,6 +9,7 @@ import akka.actor.ActorSystem;
 import akka.actor.Props;
 import akka.kernel.Bootable;
 import java.util.ArrayList;
+import java.util.Random;
 import javax.swing.JFrame;
 
 /**
@@ -19,7 +20,6 @@ public class Game implements Bootable {
 
     final static String TITLE = "GameOfLife";
     private ActorSystem system;
-//    private Cell cell;
     private ArrayList<Cell> cells = new ArrayList<>();
     private int row = 0;
     private int column = 0;
@@ -34,9 +34,6 @@ public class Game implements Bootable {
         this.row = row;
         this.column = column;
 
-//        cell = new Cell(system, 0, 0);
-//        cells.add(cell);
-
         //create cells
         for (int i = 0; i < row; i++) {
             for (int j = 0; j < column; j++) {
@@ -47,6 +44,13 @@ public class Game implements Bootable {
         //calculate the neighbors and set them for each cell
         for (Cell c1 : cells) {
             c1.setNeighbors(getNeighbors(c1));
+        }
+        
+        //set randomly cells alive / checkbox selected
+        Random random = new Random(System.currentTimeMillis());
+        
+        for (Cell cell : cells) {
+            cell.getActor().tell(new Messages.setSelected(random.nextBoolean()));
         }
 
     }
@@ -65,34 +69,26 @@ public class Game implements Bootable {
         //the row in the 2d storage
         int cellRow = index / row;
 
-        System.out.println(cell);
+//        System.out.println(cell);
 
         if (index > -1) {//cell is in cells
-
-            // (cellRow==(index+1)%row) 
-            // is checked to be sure that there are no
-            // neighbors of a cell in the 2d storage which are only visible in
-            // linear storage. e.g. jumping form the end of a row to the first 
-            // entry of the next row is no legal neighbor in the 2d storage
 
             //
             ////side neighbors
             //
             //right neighbor
             if ((index + 1 < cells.size())
-                    // && (cellRow == (index + 1) % row)
                     && inSameRow(cellRow, index + 1)) {
 
                 result.add(cells.get(index + 1));
-                System.out.println("right");
+//                System.out.println("right");
             }
             //left neighbor
             if ((index - 1 >= 0)
-                    // && (cellRow == (index - 1) % row)
                     && inSameRow(cellRow, index - 1)) {
 
                 result.add(cells.get(index - 1));
-                System.out.println("left");
+//                System.out.println("left");
             }
             //
             ////upper neighbors
@@ -100,29 +96,26 @@ public class Game implements Bootable {
             //upper right neighbor
             if ((index + 1 - row < cells.size())
                     && (index + 1 - row >= 0)
-                    //                    && (cellRow - 1 == (index + 1 - row) % row)
                     && inSameRow(cellRow - 1, index + 1 - row)) {
 
                 result.add(cells.get(index + 1 - row));
-                System.out.println("upper right");
+//                System.out.println("upper right");
             }
             //upper neighbor
             if ((index - row < cells.size())
                     && (index - row >= 0)
-                    //                    && (cellRow - 1 == (index - row) % row)
                     && inSameRow(cellRow - 1, index - row)) {
 
                 result.add(cells.get(index - row));
-                System.out.println("upper");
+//                System.out.println("upper");
             }
             //upper left neighbor
             if ((index - 1 - row < cells.size())
                     && (index - 1 - row >= 0)
-                    //                    && (cellRow - 1 == (index - 1 - row) % row)
                     && inSameRow(cellRow - 1, index - 1 - row)) {
 
                 result.add(cells.get(index - 1 - row));
-                System.out.println("upper left");
+//                System.out.println("upper left");
             }
             //
             ////lower neighbors
@@ -130,29 +123,26 @@ public class Game implements Bootable {
             //lower right neighbor
             if ((index + 1 + row < cells.size())
                     && (index + 1 + row >= 0)
-                    //                    && (cellRow + 1 == (index + 1 + row) % row)
                     && inSameRow(cellRow + 1, index + 1 + row)) {
 
                 result.add(cells.get(index + 1 + row));
-                System.out.println("lower right");
+//                System.out.println("lower right");
             }
             //lower neighbor
             if ((index + row < cells.size())
                     && (index + row >= 0)
-                    //                    && (cellRow + 1 == (index + row) % row)
                     && inSameRow(cellRow + 1, index + row)) {
 
                 result.add(cells.get(index + row));
-                System.out.println("lower");
+//                System.out.println("lower");
             }
             // lower left neighbor
             if ((index - 1 + row < cells.size())
                     && (index - 1 + row >= 0)
-                    //                    && (cellRow + 1 == (index - 1 + row) % row)
                     && inSameRow(cellRow + 1, index - 1 + row)) {
 
                 result.add(cells.get(index - 1 + row));
-                System.out.println("lower left");
+//                System.out.println("lower left");
             }
 
         }
@@ -160,14 +150,25 @@ public class Game implements Bootable {
         return result;
     }
 
+    /**
+     * To be sure check that there are no neighbors of a cell in the 2d storage
+     * which are only visible in linear storage. 
+     * e.g. for a FALSE neighbor: jumping form the end of a row to the first 
+     * entry of the next row is no legal neighbor in the 2d storage
+     * 
+     * @param rowOfCell the row where the neighbor is found in the 2d storage
+     * @param indexOfNeighbor the index of the linear storage of the possible neighbor
+     * 
+     * @return true if a legal neighbor in the 2d storage was found
+     */
     private boolean inSameRow(int rowOfCell, int indexOfNeighbor) {
         boolean result = false;
 
         int neighborRow = indexOfNeighbor / row;
 
-        System.out.println("rowOfCell = " + rowOfCell
-                + " indexOfNeighbor = " + indexOfNeighbor
-                + " neighborRow = " + neighborRow);
+//        System.out.println("rowOfCell = " + rowOfCell
+//                + " indexOfNeighbor = " + indexOfNeighbor
+//                + " neighborRow = " + neighborRow);
 
         if (rowOfCell == neighborRow) {
             result = true;
@@ -183,6 +184,7 @@ public class Game implements Bootable {
     @Override
     public void shutdown() {
         System.out.println("Game is shutting down.");
+        System.exit(0);
     }
 
     /**
