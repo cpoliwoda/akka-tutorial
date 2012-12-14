@@ -19,24 +19,33 @@ public class Game implements Bootable {
 
     final static String TITLE = "GameOfLife";
     private ActorSystem system;
-    private Cell cell;
+//    private Cell cell;
     private ArrayList<Cell> cells = new ArrayList<>();
+    private int row = 0;
+    private int column = 0;
 
-    public Game() {
+    public Game(int row, int column) {
 
         //AKKA
         system = ActorSystem.create(TITLE + "System01");
 
-        cell = new Cell(system, 0, 0);
 
-        cells.add(cell);
+        //GAME
+        this.row = row;
+        this.column = column;
 
-        for (int i = 1; i < 5; i++) {
-            cells.add(new Cell(system, 0, i));
+//        cell = new Cell(system, 0, 0);
+//        cells.add(cell);
+
+        //create cells
+        for (int i = 0; i < row; i++) {
+            for (int j = 0; j < column; j++) {
+                cells.add(new Cell(system, i, j));
+            }
         }
 
+        //calculate the neighbors and set them for each cell
         for (Cell c1 : cells) {
-
             c1.setNeighbors(getNeighbors(c1));
         }
 
@@ -50,18 +59,119 @@ public class Game implements Bootable {
     private ArrayList<Cell> getNeighbors(Cell cell) {
         ArrayList<Cell> result = new ArrayList<>();
 
+        //position in the linear storage
         int index = cells.indexOf(cell);
+
+        //the row in the 2d storage
+        int cellRow = index / row;
+
+        System.out.println(cell);
 
         if (index > -1) {//cell is in cells
 
-            if (index + 1 < cells.size()) {//there is a right neighbor
+            // (cellRow==(index+1)%row) 
+            // is checked to be sure that there are no
+            // neighbors of a cell in the 2d storage which are only visible in
+            // linear storage. e.g. jumping form the end of a row to the first 
+            // entry of the next row is no legal neighbor in the 2d storage
+
+            //
+            ////side neighbors
+            //
+            //right neighbor
+            if ((index + 1 < cells.size())
+                    // && (cellRow == (index + 1) % row)
+                    && inSameRow(cellRow, index + 1)) {
+
                 result.add(cells.get(index + 1));
+                System.out.println("right");
             }
-            if (index - 1 >= 0) {//there is a left neighbor
+            //left neighbor
+            if ((index - 1 >= 0)
+                    // && (cellRow == (index - 1) % row)
+                    && inSameRow(cellRow, index - 1)) {
+
                 result.add(cells.get(index - 1));
+                System.out.println("left");
             }
+            //
+            ////upper neighbors
+            //
+            //upper right neighbor
+            if ((index + 1 - row < cells.size())
+                    && (index + 1 - row >= 0)
+                    //                    && (cellRow - 1 == (index + 1 - row) % row)
+                    && inSameRow(cellRow - 1, index + 1 - row)) {
+
+                result.add(cells.get(index + 1 - row));
+                System.out.println("upper right");
+            }
+            //upper neighbor
+            if ((index - row < cells.size())
+                    && (index - row >= 0)
+                    //                    && (cellRow - 1 == (index - row) % row)
+                    && inSameRow(cellRow - 1, index - row)) {
+
+                result.add(cells.get(index - row));
+                System.out.println("upper");
+            }
+            //upper left neighbor
+            if ((index - 1 - row < cells.size())
+                    && (index - 1 - row >= 0)
+                    //                    && (cellRow - 1 == (index - 1 - row) % row)
+                    && inSameRow(cellRow - 1, index - 1 - row)) {
+
+                result.add(cells.get(index - 1 - row));
+                System.out.println("upper left");
+            }
+            //
+            ////lower neighbors
+            //
+            //lower right neighbor
+            if ((index + 1 + row < cells.size())
+                    && (index + 1 + row >= 0)
+                    //                    && (cellRow + 1 == (index + 1 + row) % row)
+                    && inSameRow(cellRow + 1, index + 1 + row)) {
+
+                result.add(cells.get(index + 1 + row));
+                System.out.println("lower right");
+            }
+            //lower neighbor
+            if ((index + row < cells.size())
+                    && (index + row >= 0)
+                    //                    && (cellRow + 1 == (index + row) % row)
+                    && inSameRow(cellRow + 1, index + row)) {
+
+                result.add(cells.get(index + row));
+                System.out.println("lower");
+            }
+            // lower left neighbor
+            if ((index - 1 + row < cells.size())
+                    && (index - 1 + row >= 0)
+                    //                    && (cellRow + 1 == (index - 1 + row) % row)
+                    && inSameRow(cellRow + 1, index - 1 + row)) {
+
+                result.add(cells.get(index - 1 + row));
+                System.out.println("lower left");
+            }
+
         }
 
+        return result;
+    }
+
+    private boolean inSameRow(int rowOfCell, int indexOfNeighbor) {
+        boolean result = false;
+
+        int neighborRow = indexOfNeighbor / row;
+
+        System.out.println("rowOfCell = " + rowOfCell
+                + " indexOfNeighbor = " + indexOfNeighbor
+                + " neighborRow = " + neighborRow);
+
+        if (rowOfCell == neighborRow) {
+            result = true;
+        }
         return result;
     }
 
@@ -80,13 +190,6 @@ public class Game implements Bootable {
      */
     public ActorSystem getSystem() {
         return system;
-    }
-
-    /**
-     * @return the actor
-     */
-    public Cell getCell() {
-        return cell;
     }
 
     /**
