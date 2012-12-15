@@ -14,16 +14,16 @@ public class CellActor extends UntypedActor {
 
     // the cell this actor belongs to
     Cell cell;
-
+    
     public CellActor(Cell cell) {
         this.cell = cell;
     }
-
+    
     @Override
     public void onReceive(Object o) throws Exception {
-
+        
         if (o instanceof Messages.Message) {
-
+            
             if (o instanceof Messages.isSelected) {
                 Messages.isSelected msg = (Messages.isSelected) o;
                 System.out.println("Is checkbox selected: " + msg.isSelected());
@@ -33,15 +33,15 @@ public class CellActor extends UntypedActor {
             } else if (o instanceof Messages.setSelected) {
                 Messages.setSelected msg = (Messages.setSelected) o;
                 cell.getCheckBox().setSelected(msg.isSelected());
-
+                
             } else if (o instanceof Messages.Start) {
                 Messages.Start msg = (Messages.Start) o;
                 System.out.println(msg);
-
+                
             } else if (o instanceof Messages.Stop) {
                 Messages.Stop msg = (Messages.Stop) o;
                 System.out.println(msg);
-
+                
             } else if (o instanceof Messages.getNeighbors) {
                 Messages.getNeighbors msg = (Messages.getNeighbors) o;
 
@@ -54,24 +54,26 @@ public class CellActor extends UntypedActor {
             } else if (o instanceof Messages.setNeighbors) {
                 Messages.setNeighbors msg = (Messages.setNeighbors) o;
                 cell.setNeighbors(msg.getNeighbors());
-
+                
             } else if (o instanceof Messages.Update) {
-
+                
                 int aLiveNeighbors = 0;
-
+                
                 for (Cell neighbor : cell.getNeighbors()) {
                     if (neighbor.getCheckBox().isSelected()) {
                         aLiveNeighbors++;
                     }
                 }
-
+                
                 if (aLiveNeighbors >= 2 && aLiveNeighbors <= 5) {
                     getSelf().tell(new Messages.setSelected(true));
                 } else {
                     getSelf().tell(new Messages.setSelected(false));
                 }
+                
+                getSender().tell(new Messages.UpdateDone(), getSelf());
             }
-
+            
         } else {
             System.out.println(" Unknown Message !!!");
         }

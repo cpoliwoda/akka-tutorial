@@ -19,6 +19,9 @@ public class Messages {
     public static class Update implements Message{
     }
     
+    public static class UpdateDone implements Message{
+    }
+    
     protected static class Neighbors implements Message{
         private ArrayList<Cell> neighbors;
 
