@@ -93,12 +93,13 @@ public class Cell extends UntypedActor {
 //                become(running);
                 running = true;
 
-            } else {
-                System.out.println("sorry ... not in mode initializing");
             }
         }//initializing
+        else if(!initializing){
+            System.out.println("sorry ... not in mode initializing");
+        }
 
-        else if (running) {
+        if (running) {
 
             if (o instanceof Dead) {
                 System.out.println("neighbor gone");
@@ -121,7 +122,8 @@ public class Cell extends UntypedActor {
                 initializing = true;
             }
         }//running    
-        else {
+        
+        if( !(o instanceof Events.Event)) {
             System.out.println("Unknown Message: " + o.getClass().getSimpleName());
         }
 
