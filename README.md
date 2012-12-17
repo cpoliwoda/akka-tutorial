@@ -1,4 +1,6 @@
 akka-tutorial
 =============
 
-this project is a simple akka2.0.3 tutorial in java.
+This project is a simple netbeans project for akka2.0.3.
+
+It includes a tutorial in java and a sample application gameOfLife.
