@@ -5,7 +5,6 @@
 package example00.gameOfLife01;
 
 import akka.actor.ActorRef;
-import akka.actor.Actors;
 import akka.actor.Props;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;

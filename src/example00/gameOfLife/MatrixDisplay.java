@@ -5,17 +5,6 @@
 package example00.gameOfLife;
 
 import akka.actor.ActorRef;
-import akka.actor.Props;
-import akka.dispatch.Await;
-import akka.dispatch.Future;
-import akka.pattern.Patterns;
-import akka.util.Duration;
-import akka.util.Timeout;
-import java.awt.GridLayout;
-import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.swing.JPanel;
 
 /**
  *

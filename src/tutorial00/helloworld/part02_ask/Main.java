@@ -7,16 +7,15 @@ package tutorial00.helloworld.part02_ask;
 import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
 import akka.actor.Props;
-import static akka.pattern.Patterns.ask;
-import static akka.pattern.Patterns.pipe;
-import akka.dispatch.Future;
 import akka.dispatch.Futures;
 import akka.dispatch.Mapper;
-import akka.util.Duration;
+import akka.pattern.Patterns;
 import akka.util.Timeout;
-import java.util.concurrent.TimeUnit;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.concurrent.TimeUnit;
+import scala.concurrent.Future;
+import scala.concurrent.duration.FiniteDuration;
 
 /** 
  * BASED ON CODE FROM: http://doc.akka.io/docs/akka/2.0.3/java/untyped-actors.html
@@ -50,30 +49,63 @@ public class Main {
 
         //ask the actors for a message/result
 
-        final Timeout t = new Timeout(Duration.create(5, TimeUnit.SECONDS));
+
+//        //// START Code for akka 2.0.3 NEED TO be changed
+//        
+//        final Timeout t = new Timeout(FiniteDuration.create(5, TimeUnit.SECONDS));
+//
+//        final ArrayList<Future<Object>> futures = new ArrayList<Future<Object>>();
+//        futures.add(Patterns.ask(actorA, new Result(0, "zero"), 1000)); // using 1000ms timeout
+//        futures.add(Patterns.ask(actorB, "request", t)); // using timeout from above
+//
+//        final Future<Iterable<Object>> aggregate = Futures.sequence(futures, system.dispatcher());
+
+//        
+//        final Future<Result> transformed = aggregate.map(new Mapper<Iterable<Object>, Result>() {
+//            @Override
+//            public Result apply(Iterable<Object> coll) {
+//                final Iterator<Object> it = coll.iterator();
+//
+//                final String s = (String) it.next();
+//                final int x = (Integer) it.next();
+//
+//                return new Result(x, s);
+//            }
+//        });
+//
+//        pipe(transformed).to(actorC);
+//        //// END Code for akka 2.0.3
+
+//////        START akka 2.1.0
+
+        final Timeout t = new Timeout(FiniteDuration.create(5, TimeUnit.SECONDS));
 
         final ArrayList<Future<Object>> futures = new ArrayList<Future<Object>>();
-        futures.add(ask(actorA, new Result(0, "zero"), 1000)); // using 1000ms timeout
-        futures.add(ask(actorB, "request", t)); // using timeout from above
+        futures.add(Patterns.ask(actorA, "request", 1000)); // using 1000ms timeout
+        futures.add(Patterns.ask(actorB, "another request", t)); // using timeout from above
 
-        final Future<Iterable<Object>> aggregate = Futures.sequence(futures, system.dispatcher());
+        final Future<Iterable<Object>> aggregate =
+                Futures.sequence(futures, system.dispatcher());
 
-        final Future<Result> transformed = aggregate.map(new Mapper<Iterable<Object>, Result>() {
+        Mapper mapper = new Mapper<Iterable<Object>, Result>() {
+            
             @Override
             public Result apply(Iterable<Object> coll) {
                 final Iterator<Object> it = coll.iterator();
-
                 final String s = (String) it.next();
                 final int x = (Integer) it.next();
-
                 return new Result(x, s);
             }
-        });
+        };
+        
+        final Future<Result> transformed = aggregate.map(mapper, system.dispatcher());
 
-        pipe(transformed).to(actorC);
+        Patterns.pipe(transformed, system.dispatcher()).to(actorC);
 
+//////        END akka 2.1.0
 
         //shutdown the actor system
         system.shutdown();
+        system.awaitTermination();
     }
 }

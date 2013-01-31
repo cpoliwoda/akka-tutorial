@@ -5,10 +5,7 @@
 package example00.gameOfLife;
 
 import akka.actor.ActorRef;
-import akka.dispatch.Await;
-import akka.dispatch.Future;
 import akka.pattern.Patterns;
-import akka.util.Duration;
 import akka.util.Timeout;
 import java.awt.Color;
 import java.awt.FlowLayout;
@@ -18,8 +15,11 @@ import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JPanel;
-import javax.swing.border.Border;
 import javax.swing.border.LineBorder;
+import scala.concurrent.Await;
+import scala.concurrent.Future;
+import scala.concurrent.duration.Duration;
+import scala.concurrent.duration.FiniteDuration;
 
 /**
  *
@@ -45,7 +45,7 @@ public class FlowPanel extends JPanel implements MouseListener {
     public void mouseClicked(MouseEvent e) {
 
         //java
-        Duration duration = Duration.create(1, TimeUnit.SECONDS);
+        FiniteDuration duration = Duration.create(1, TimeUnit.SECONDS);
         Timeout timeout = new Timeout(duration);
         Future<Object> future = Patterns.ask(cell, new Events.GetState(), timeout);
 

@@ -5,11 +5,7 @@
 package example00.gameOfLife;
 
 import akka.actor.ActorRef;
-import akka.actor.UntypedActor;
-import akka.dispatch.Await;
-import akka.dispatch.Future;
 import akka.pattern.Patterns;
-import akka.util.Duration;
 import akka.util.Timeout;
 import example00.gameOfLife.Events.Position;
 import java.util.ArrayList;
@@ -17,6 +13,10 @@ import java.util.Iterator;
 import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import scala.concurrent.Await;
+import scala.concurrent.Future;
+import scala.concurrent.duration.Duration;
+import scala.concurrent.duration.FiniteDuration;
 import tutorial00.helloworld.part01_ask.Main;
 
 /**
@@ -108,7 +108,7 @@ public class CellMatrix implements Iterable<CellRow> {
 //                cell.tell(new Events.Init()); // TELL?? 
                 
                 //ASK =>
-                Duration duration = Duration.create(5, TimeUnit.SECONDS);
+                FiniteDuration duration = Duration.create(5, TimeUnit.SECONDS);
                 final Timeout timeout = new Timeout(duration);
 
                 // this is one way to "ask" an actor
@@ -174,7 +174,7 @@ public class CellMatrix implements Iterable<CellRow> {
         int rowDimension = dimension[0];
         int columnDimension = dimension[1];
 
-        Duration duration = Duration.create(5, TimeUnit.SECONDS);
+        FiniteDuration duration = Duration.create(5, TimeUnit.SECONDS);
         final Timeout timeout = new Timeout(duration);
 
         // this is one way to "ask" an actor

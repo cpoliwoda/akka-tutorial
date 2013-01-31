@@ -7,20 +7,15 @@ package tutorial00.helloworld.part01_ask;
 import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
 import akka.actor.Props;
-import akka.dispatch.Await;
 import akka.pattern.Patterns;
-import akka.pattern.Patterns;
-import akka.dispatch.Future;
-import akka.dispatch.Futures;
-import akka.dispatch.Mapper;
-import akka.util.Duration;
 import akka.util.Timeout;
 import java.util.concurrent.TimeUnit;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.jar.Manifest;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import scala.concurrent.Await;
+import scala.concurrent.Future;
+import scala.concurrent.duration.Duration;
+import scala.concurrent.duration.FiniteDuration;
 
 /** 
  * BASED ON CODE FROM: http://doc.akka.io/docs/akka/2.0.3/java/untyped-actors.html
@@ -54,7 +49,7 @@ public class Main {
         //ask the actor for a message/result
         //
         
-        Duration duration = Duration.create(5, TimeUnit.SECONDS);
+        FiniteDuration duration = Duration.create(5, TimeUnit.SECONDS);
         final Timeout timeout = new Timeout(duration);
 
         // this is one way to "ask" an actor
