@@ -7,6 +7,7 @@ package tutorial07.restartActor;
 import akka.actor.ActorPath;
 import akka.actor.ActorRef;
 import akka.actor.OneForOneStrategy;
+import akka.actor.Props;
 import akka.actor.SupervisorStrategy;
 import akka.actor.UntypedActor;
 import akka.japi.Function;
@@ -14,19 +15,29 @@ import scala.Option;
 import scala.concurrent.duration.Duration;
 
 /**
- * An simple actor that prints the messages it gots on the output stream.
  * 
  * @author Christian Poliwoda <christian.poliwoda@gcsc.uni-frankfurt.de>
  */
-public class HelloActor extends UntypedActor {
+public class SupervisorActor extends UntypedActor {
 
+    private final ActorRef worker = this.getContext().actorOf(new Props(WorkerActor.class), "worker");
+
+    public SupervisorActor() {
+
+        this.getContext().watch(worker); // <-- the only call needed for registration
+    }
     private static SupervisorStrategy strategy = new OneForOneStrategy(3,
             Duration.create("5 seconds"), new Function<Throwable, SupervisorStrategy.Directive>() {
         @Override
         public SupervisorStrategy.Directive apply(Throwable t) {
 
             if (t instanceof Messages.Stop) {
+//                SupervisorActor.this.getContext().stop(worker);
+
                 return SupervisorStrategy.stop();
+
+            } else if (t instanceof Messages.Resume) {
+                return SupervisorStrategy.resume();
 
             } else if (t instanceof Messages.Restart) {
                 return SupervisorStrategy.restart();
@@ -36,7 +47,14 @@ public class HelloActor extends UntypedActor {
             }
 
         }//apply
-    });
+    });//OneForOneStrategy()
+
+    /**
+     * @return the strategy
+     */
+    public static SupervisorStrategy getStrategy() {
+        return strategy;
+    }
 
     @Override
     public SupervisorStrategy supervisorStrategy() {
@@ -51,23 +69,52 @@ public class HelloActor extends UntypedActor {
         ActorPath actorPath = getContext().system().child(actorName);
         ActorRef actor = getContext().actorFor(actorPath);
 
-        System.out.println(simpleClassName + "." + actorName + " got mail:");
+        System.out.println(simpleClassName + "." + actorName + " got mail from " + getSender() + ":");
 
         if (o instanceof Messages.EventImpl) {
             Messages.EventImpl msg = (Messages.EventImpl) o;
             System.out.println("  >> " + msg);
 
-            if (msg instanceof Messages.Stop) {
-                getContext().stop(getSelf());
+            if (msg instanceof Messages.Start) {
+                worker.tell(msg, getSelf());
+
+            } else if (msg instanceof Messages.Stop) {
+
+                System.out.println("want to stop actor: " + actorName);
+
+                System.out.println("actor.isTerminated() BEFORE  "
+                        + "getContext().stop( worker ): " + getSelf().isTerminated());
+
+                getContext().stop(worker);
+
+                System.out.println("actor.isTerminated() AFTER "
+                        + "getContext().stop( worker ): " + getSelf().isTerminated());
+
+
+            } else if (msg instanceof Messages.Resume) {
+
+                System.out.println("want to resume actor: " + actorName);
+
+                System.out.println("actor.isTerminated() BEFORE "
+                        + "getStrategy().resumeChild( ): " + getSelf().isTerminated());
+
+                getStrategy().resumeChild(worker, msg);
+
+                System.out.println("actor.isTerminated() AFTER "
+                        + "getStrategy().resumeChild( ): " + getSelf().isTerminated());
+
 
             } else if (msg instanceof Messages.Restart) {
-//                getContext().system().actorOf(new Props(HelloActor.class), "actor1");//[ERROR] [01/11/2013 13:52:40.001] [default-akka.actor.default-dispatcher-5] [akka://default/user/actor2] actor name actor1 is not unique!
+                
+                System.out.println("want to restart actor: " + actorName);
 
-//                System.out.println("getContext().system().child( " + actorName
-//                        + " ).name() = " + actorName);
+                System.out.println("actor.isTerminated() BEFORE "
+                        + "getStrategy().restartChild( ): " + getSelf().isTerminated());
 
-                System.out.println(actorName + ".isTerminated() = "
-                        + actor.isTerminated());
+                getStrategy().restartChild(worker, msg, true);
+
+                System.out.println("actor.isTerminated() AFTER "
+                        + "getStrategy().restartChild( ): " + getSelf().isTerminated());
 
             }
 
@@ -102,35 +149,5 @@ public class HelloActor extends UntypedActor {
 
         System.out.println(getSelf().path().name() + ".postStop() called.");
     }
-    //onReceive
-//    public void resume(){
-//        getContext().guardian().resume();
-//    }
-//    
-//    public void restart(Throwable throwable ){
-//        getContext().guardian().restart(throwable );
-//    }
-//    
-//    public void suspend(){
-//        getContext().guardian().suspend();
-//    }
-//    
-//    private SupervisorStrategy strategy = new OneForOneStrategy(
-//            10, Duration.parse("1 minute"), new Function() {
-//        @Override
-//        public Object apply(Object t) {
-//            if (t instanceof ArithmeticException) {
-//                return new Resume();
-//            } else if (t instanceof NullPointerException) {
-//                return new Restart();
-//            } else {
-//                return new Escalate();
-//            }
-//        }
-//    });
-//
-//    @Override
-//    public SupervisorStrategy supervisorStrategy() {
-//        return strategy;
-//    }
+    
 }

@@ -19,8 +19,8 @@ class Messages {
     /**
      * base class for all messages in this package (tutorial07.restart)
      */
-    public static class EventImpl extends Throwable{
-        protected String message = "";
+    public static class EventImpl extends Throwable implements Event{
+        protected String message = "--no-message--";
 
         public EventImpl() {
         }
@@ -47,6 +47,12 @@ class Messages {
         
         public Stop() {
             super("STOP");
+        }
+    }
+    
+    public static class Resume extends EventImpl{
+        public Resume() {
+            super("RESUME");
         }
     }
     

@@ -16,76 +16,60 @@ import akka.actor.Props;
 public class Main {
 
     public static void main(String[] args) {
+        
         //create an actor system
         ActorSystem system = ActorSystem.create();
 
         //create a new actor
-        ActorRef actor1 = system.actorOf(new Props(HelloActor.class), "actor1");
-        ActorRef actor2 = system.actorOf(new Props(HelloActor.class), "actor2");
-//        ActorRef actor2 = actor1.getContext().actorOf(new Props(HelloActor.class), "actor2");
-
+        ActorRef actor1 = system.actorOf(new Props(SupervisorActor.class), "actor1");
+        ActorRef actor2 = system.actorOf(new Props(SupervisorActor.class), "actor2");
+        
+        String actor1name = actor1.path().name();
+        String actor2name = actor2.path().name();
 
         //send the actor a message
-        Messages.EventImpl event1 = new Messages.EventImpl(actor1.path().name() + " - Hi 1 - ");
-        actor1.tell(event1, actor2);
-
-        isActorTerminated(actor1);
-
-//        system.stop(actor1);
-//        system.guardian().suspend(); //no effect on actor
-//        system.guardian().stop();    //no effect on actor
-
-//        isActorTerminated(actor1);
-
-        Messages.EventImpl event2 = new Messages.EventImpl(actor1.path().name() + " - Hi 2 - ");
-        actor1.tell(event2, actor2);
-
-//        system.guardian().restart(null);
-        isActorTerminated(actor1);
-
-        Messages.EventImpl event3 = new Messages.EventImpl(actor1.path().name() + " - Hi 3 - ");
-        actor1.tell(event3, actor2);
-
-//        system.guardian().resume(new Exception("system.guardian().resume"));
-        isActorTerminated(actor1);
-
-        Messages.EventImpl event4 = new Messages.EventImpl(actor1.path().name() + " - Hi 4 - ");
-        actor1.tell(event4, actor2);
-
-//        actor1.tell(Kill.getInstance(), null);
-//        isActorTerminated(actor1);
-
-        Messages.EventImpl event5 = new Messages.EventImpl(actor1.path().name() + " - Hi 5 - ");
-        actor1.tell(event5, actor2);
+        
+//        Messages.EventImpl e000 = new Messages.EventImpl(" - pre start - ");
+//        actor1.tell(e000, actor2);
+        
+        Messages.Start e00 = new Messages.Start();
+        actor1.tell(e00, actor2);
+        
+//        Messages.EventImpl e0 = new Messages.EventImpl(" - post start - ");
+//        actor1.tell(e0, actor2);
+//        
+//        Messages.EventImpl e1 = new Messages.EventImpl(" - pre stop - ");
+//        actor1.tell(e1, actor2);
 
         Messages.Stop stop = new Messages.Stop();
         actor1.tell(stop, actor2);
-        isActorTerminated(actor1);
+        
+        
+//        Messages.EventImpl e2 = new Messages.EventImpl(actor1name + " - post stop - ");
+//        actor1.tell(e2, actor2);
+//
+//        Messages.EventImpl e3 = new Messages.EventImpl(actor1name + " - pre resume - ");
+//        actor1.tell(e3, actor2);
 
-        Messages.EventImpl event6_1 = new Messages.EventImpl(actor1.path().name() + " - Hi 6.1 - ");
-        Messages.EventImpl event6_2 = new Messages.EventImpl(actor1.path().name() + " - Hi 6.2 - ");
-
-        actor1.tell(event6_1, actor2);
-        actor2.tell(event6_2, actor2);
-
-        isActorTerminated(actor1);
-
-
+        Messages.Resume resume = new Messages.Resume();
+        actor1.tell(resume, actor2);
+        
+//        Messages.EventImpl e4 = new Messages.EventImpl(actor1name + " - post resume - ");
+//        actor1.tell(e4, actor2);
+//        
+//        Messages.EventImpl e5 = new Messages.EventImpl(actor1.path().name() + " - pre restart - ");
+//        actor1.tell(e5, actor2);
+        
         Messages.Restart restart = new Messages.Restart();
-        actor2.tell(restart, actor2);
-
-        isActorTerminated(actor1);
-
-
-        Messages.EventImpl event7 = new Messages.EventImpl(actor2.path().name() + " - Hi 7 - ");
-        actor2.tell(event7, actor2);
-
-        isActorTerminated(actor1);
+        actor1.tell(restart, actor2);
+        
+//        Messages.EventImpl e6 = new Messages.EventImpl(actor1name + " - post restart - ");
+//        actor1.tell(e6, actor2);
 
         //shutdown the actor system
         system.shutdown();
         system.awaitTermination();
-    }
+    }//main
 
     private static void isActorTerminated(ActorRef actor) {
 
@@ -101,5 +85,9 @@ public class Main {
 
             actor.tell(actor.path().name() + msg, null);
         }
-    }
+        
+        
+        
+    }//isActorTerminated()
+    
 }
