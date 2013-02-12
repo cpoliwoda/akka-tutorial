@@ -2,7 +2,7 @@
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
-package tutorial08.createChildActor;
+package tutorial07.createChildActor;
 
 import akka.actor.ActorRef;
 import akka.actor.Props;

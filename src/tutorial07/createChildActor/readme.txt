@@ -1,5 +1,5 @@
 Based on the package tutorial01.helloworld.configFile:
-This package (tutorial08.createCildActor) is a simple example of:
+This package (tutorial07.createCildActor) is a simple example of:
 
 
 ## Learning
