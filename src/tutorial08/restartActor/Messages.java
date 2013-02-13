@@ -62,4 +62,9 @@ class Messages {
         }
     }
     
+    public static class CheckTermination extends EventImpl{
+        public CheckTermination() {
+            super("CHECKTERMINATION");
+        }
+    }
 }
