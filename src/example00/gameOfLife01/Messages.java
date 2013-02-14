@@ -97,10 +97,24 @@ public class Messages {
         }
     }
     
-    public static class Stop implements Message{ 
+    public static class Stop extends Throwable implements Message{ 
         @Override
         public String toString() {
             return "Stop";
+        }
+    }
+    
+    public static class Resume extends Throwable implements Message{ 
+        @Override
+        public String toString() {
+            return "Resume";
+        }
+    }
+    
+    public static class Restart extends Throwable implements Message{ 
+        @Override
+        public String toString() {
+            return "Restart";
         }
     }
 }

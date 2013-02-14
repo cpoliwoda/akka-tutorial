@@ -19,9 +19,13 @@ import javax.swing.JFrame;
  */
 public class Main {
 
+//    GUI
     private static JFrame frame;
-    private static int row = 19;
-    private static int column = 19;
+    private static JButton startButton = null;
+    private static JButton stopButton = null;
+//    Properties
+    private static int row = 11;
+    private static int column = 11;
 
     public static void main(String[] args) {
 
@@ -30,6 +34,8 @@ public class Main {
 
         generateGUI(app);
 //        new Main(Game.TITLE, app);
+        
+        generateLogic(app);
 
 //        app.shutdown();
     }
@@ -43,50 +49,8 @@ public class Main {
         Box innerMenu = Box.createHorizontalBox();
         Box innerCells = Box.createVerticalBox();
 
-        JButton startButton = new JButton("start");
-        JButton stopButton = new JButton("stop");
-
-        final ActorRef startActor = app.getSystem().actorOf(new Props(ButtonActor.class),"startActor");
-
-        startButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-//                System.out.println("START-BUTTON");
-                
-                System.out.println(app.getSystem());
-                System.out.println(startActor);
-                
-                if(startActor.isTerminated()){
-                    System.out.println("startActor.isTerminated = "+startActor.isTerminated());
-//                    app.getSystem()
-//                    startActor.
-                    
-////////                    TODO:      restart startActor ! ! !
-                }
-                
-                for (Cell cell : app.getCells()) {
-                    cell.getActor().tell(new Messages.Update(), startActor);
-                }
-
-            }
-        });
-        
-        final ActorRef stopActor = app.getSystem().actorOf(new Props(ButtonActor.class),"stopActor");
-
-        stopButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-//                System.out.println("STOP-BUTTON");
-                
-//                for (Cell cell : app.getCells()) {
-//                    cell.getActor().tell(new Messages.Stop(), stopActor);
-//                }
-//                
-//                startActor.tell(new Messages.Stop());
-                
-                app.getSystem().stop(startActor);
-            }
-        });
+        startButton = new JButton("start");
+        stopButton = new JButton("stop");
 
         innerMenu.add(startButton);
         innerMenu.add(stopButton);
@@ -101,6 +65,50 @@ public class Main {
         frame.pack();
         frame.setVisible(true);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    }
+    
+    private static void generateLogic(final Game app) {
+        final ActorRef startActor = app.getSystem().actorOf(new Props(ButtonActor.class), "startActor");
+
+        startButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+//                System.out.println("START-BUTTON");
+
+                System.out.println(app.getSystem());
+                System.out.println(startActor);
+
+                if (startActor.isTerminated()) {
+                    System.out.println("startActor.isTerminated = " + startActor.isTerminated());
+//                    app.getSystem()
+//                    startActor.
+
+////////                    TODO:      restart startActor ! ! !
+                }
+
+                for (Cell cell : app.getCells()) {
+                    cell.getActor().tell(new Messages.Update(), startActor);
+                }
+
+            }
+        });
+
+        final ActorRef stopActor = app.getSystem().actorOf(new Props(ButtonActor.class), "stopActor");
+
+        stopButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+//                System.out.println("STOP-BUTTON");
+
+//                for (Cell cell : app.getCells()) {
+//                    cell.getActor().tell(new Messages.Stop(), stopActor);
+//                }
+//                
+//                startActor.tell(new Messages.Stop());
+
+                app.getSystem().stop(startActor);
+            }
+        });
     }
 
     private static void addCellsToBox(Box box, ArrayList<Cell> cells) {
@@ -127,4 +135,6 @@ public class Main {
     private static int getListIndex(int rowPos, int colPos) {
         return rowPos * row + colPos;
     }
+
+    
 }
