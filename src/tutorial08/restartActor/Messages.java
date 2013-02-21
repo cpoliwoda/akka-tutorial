@@ -4,6 +4,8 @@
  */
 package tutorial08.restartActor;
 
+import akka.actor.ActorRef;
+
 /**
  *
  * @author Christian Poliwoda <christian.poliwoda@gcsc.uni-frankfurt.de>
@@ -67,4 +69,22 @@ class Messages {
             super("CHECKTERMINATION");
         }
     }
+    
+    public static class ReactivateChild extends EventImpl{
+        
+        private ActorRef child = null;
+        
+        public ReactivateChild(ActorRef child) {
+            super("REACTIVATEchild");
+            this.child=child;
+        }
+
+        /**
+         * @return the child
+         */
+        public ActorRef getChild() {
+            return child;
+        }
+    }
+    
 }

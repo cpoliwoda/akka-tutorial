@@ -20,22 +20,21 @@ public class WorkerActor extends UntypedActor {
 
         String simpleClassName = getClass().getSimpleName();
         String actorName = getSelf().path().name();
+        String senderName = getSender().path().name();
         ActorPath actorPath = getContext().system().child(actorName);
         ActorRef actor = getContext().actorFor(actorPath);
 
-        System.out.println(simpleClassName + "." + actorName + " got mail from " + getSender() + ":");
-
+        System.out.println( "receiver = " + simpleClassName + "." + actorName
+                + " , sender = " + senderName
+                + " , message = " + o);
+        
+        
         if (o instanceof Messages.EventImpl) {
-            Messages.EventImpl msg = (Messages.EventImpl) o;
-
-            System.out.println(msg);
+            
+            //nothing to do here yet
 
         } else {
-            System.out.println("unhandled message :-( ");
-
-            System.out.println("BEFORE unhandled: " + "isTerminated() " + getSelf().isTerminated());
             unhandled(o);
-            System.out.println("AFTER unhandled: " + "isTerminated() " + getSelf().isTerminated());
         }
     }
     

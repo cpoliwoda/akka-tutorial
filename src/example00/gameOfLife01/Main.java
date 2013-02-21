@@ -24,18 +24,21 @@ public class Main {
     private static JButton startButton = null;
     private static JButton stopButton = null;
 //    Properties
-    private static int row = 11;
-    private static int column = 11;
+    private static int row = 9;
+    private static int column = 9;
+//    Logic
+    private static ActorRef gameActor = null;
 
     public static void main(String[] args) {
 
         Game app = new Game(row, column);
-        System.out.println("Game created.");
+        System.out.println(">> Game created.");
 
         generateGUI(app);
-//        new Main(Game.TITLE, app);
+        System.out.println(">> GUI created.");
         
         generateLogic(app);
+        System.out.println(">> Logic created.");
 
 //        app.shutdown();
     }
@@ -65,51 +68,35 @@ public class Main {
         frame.pack();
         frame.setVisible(true);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-    }
+        
+    }//generateGUI()
     
     private static void generateLogic(final Game app) {
-        final ActorRef startActor = app.getSystem().actorOf(new Props(ButtonActor.class), "startActor");
-
+        gameActor = app.getSystem().actorOf(new Props(GameActor.class), "gameActor");
+        
+        //init inner variable game in GameActor
+        gameActor.tell(app, gameActor);
+        
         startButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-//                System.out.println("START-BUTTON");
+                System.out.println("START-BUTTON");
 
-                System.out.println(app.getSystem());
-                System.out.println(startActor);
-
-                if (startActor.isTerminated()) {
-                    System.out.println("startActor.isTerminated = " + startActor.isTerminated());
-//                    app.getSystem()
-//                    startActor.
-
-////////                    TODO:      restart startActor ! ! !
-                }
-
-                for (Cell cell : app.getCells()) {
-                    cell.getActor().tell(new Messages.Update(), startActor);
-                }
+                gameActor.tell(new Messages.Start(), gameActor);
 
             }
         });
-
-        final ActorRef stopActor = app.getSystem().actorOf(new Props(ButtonActor.class), "stopActor");
 
         stopButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-//                System.out.println("STOP-BUTTON");
-
-//                for (Cell cell : app.getCells()) {
-//                    cell.getActor().tell(new Messages.Stop(), stopActor);
-//                }
-//                
-//                startActor.tell(new Messages.Stop());
-
-                app.getSystem().stop(startActor);
+                System.out.println("STOP-BUTTON");
+                
+                gameActor.tell(new Messages.Stop(), gameActor);
             }
         });
-    }
+        
+    }//generateLogic()
 
     private static void addCellsToBox(Box box, ArrayList<Cell> cells) {
 

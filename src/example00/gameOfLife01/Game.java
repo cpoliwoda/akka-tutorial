@@ -4,13 +4,10 @@
  */
 package example00.gameOfLife01;
 
-import akka.actor.ActorRef;
 import akka.actor.ActorSystem;
-import akka.actor.Props;
 import akka.kernel.Bootable;
 import java.util.ArrayList;
 import java.util.Random;
-import javax.swing.JFrame;
 
 /**
  *
