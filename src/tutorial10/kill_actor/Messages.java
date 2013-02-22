@@ -42,4 +42,11 @@ class Messages {
             super("START");
         }
     }
+    
+    public static class MyKill extends EventImpl {
+
+        public MyKill() {
+            super("MyKill");
+        }
+    }
 }

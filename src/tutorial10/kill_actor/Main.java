@@ -23,11 +23,11 @@ public class Main {
         ActorSystem system = ActorSystem.create();
 
         //create a new actor
-        ActorRef loggingActor = system.actorOf(new Props(LoggingActor.class), "loggingActor");
+        ActorRef myActor = system.actorOf(new Props(MyActor.class), "myActor");
 
         
         //start the show  ;-)
-        loggingActor.tell(new Messages.Start(), loggingActor);
+        myActor.tell(new Messages.Start(), myActor);
 
 
         //wait before closing the akka system
