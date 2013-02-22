@@ -13,13 +13,13 @@ import akka.actor.ActorRef;
 class Messages {
     
     /**
-     * base interface for all messages in this package (tutorial07.restart)
+     * base interface for all messages in this package
      */
     public static interface Event {        
     }
     
     /**
-     * base class for all messages in this package (tutorial07.restart)
+     * base class for all messages in this package
      */
     public static class EventImpl extends Throwable implements Event{
         protected String message = "--no-message--";
